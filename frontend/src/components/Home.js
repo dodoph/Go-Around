@@ -27,12 +27,24 @@ export class Home extends React.Component {
             });
         }
     }
-    onGeolocationSuccess = (position) => {
-
+    onGeolocationSuccess = (position) => { //onGeolocationSuccess is variable which should bind this context-lamuda
+        this.setState({
+            loadingGeolocation: false,
+            errorMessage: null,
+        });
+        console.log(position);
     }
     onGeolocationFailure = () => {
-
+        this.setState({
+            loadingGeolocation: false,
+            errorMessage: 'Failed to load geolocation',
+        });
     }
+
+    componentDidMount() { //call geolocation()
+        this.getGeolocation();
+    }
+
     render() {
         const operations = <Button>Create New Post</Button>;
         return (
