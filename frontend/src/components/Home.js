@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tabs, Button } from 'antd';
+import { GEOLOCATION_OPTIONS, POSITION_KEY } from '../constants';
 import '../styles/Home.css';
 
 const { TabPane } = Tabs;
@@ -19,6 +20,7 @@ export class Home extends React.Component {
             navigator.geolocation.getCurrentPosition(
                 this.onGeolocationSuccess,
                 this.onGeolocationFailure,
+                GEOLOCATION_OPTIONS,
             );
         } else {
             this.setState({
@@ -27,12 +29,15 @@ export class Home extends React.Component {
             });
         }
     }
+    //browser will call this lamuda function
     onGeolocationSuccess = (position) => { //onGeolocationSuccess is variable which should bind this context-lamuda
         this.setState({
             loadingGeolocation: false,
             errorMessage: null,
         });
         console.log(position);
+        const { latitude, longitude } = position.coords; //get postion in string type
+        localStorage.setItem(POSITION_KEY, JSON.stringify({ latitude, longitude })); //convert string to JSON
     }
     onGeolocationFailure = () => {
         this.setState({
