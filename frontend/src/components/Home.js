@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs, Button } from 'antd';
-import { GEOLOCATION_OPTIONS, POSITION_KEY } from '../constants';
+import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER } from '../constants';
 import '../styles/Home.css';
 
 const { TabPane } = Tabs;
@@ -50,7 +50,36 @@ export class Home extends React.Component {
     }
 
     loadNearByPost() {
+        this.setState({
+            loadingPosts: true,
+            errorMessage: null,
+        });
+        const position = JSON.parse(localStorage.getItem(POSITION_KEY)); //convert string to JSON object
+        const range = 20000;
+        const token = localStorage.getItem(TOKEN_KEY); //get token from browser
 
+        fetch(`${API_ROOT}/search?lat=${position.latitude}&lon=${position.longitude}&range=${range}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `${AUTH_HEADER} ${token}`,
+            },
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Fail to load posts');
+        }).then((data) => {
+            console.log(data);
+            this.setState({
+                loadingPosts: false,
+                posts: data ? data : [],
+            })
+        }).catch((error) => {
+            this.setState({
+                loadingPosts: false,
+                errorMessage: error.message,
+            })
+        })
     }
 
     componentDidMount() { //call geolocation()
