@@ -8,7 +8,9 @@ const { TabPane } = Tabs;
 export class Home extends React.Component {
     state = {
         loadingGeolocation: false,
+        loadingPosts: false, //state is reading post
         errorMessage: null,
+        post:[], //store posts
     }
 
     getGeolocation() {
@@ -36,14 +38,19 @@ export class Home extends React.Component {
             errorMessage: null,
         });
         console.log(position);
-        const { latitude, longitude } = position.coords; //get postion in string type
-        localStorage.setItem(POSITION_KEY, JSON.stringify({ latitude, longitude })); //convert string to JSON
+        const { latitude, longitude } = position.coords; //get position in object and map to coords
+        localStorage.setItem(POSITION_KEY, JSON.stringify({ latitude, longitude })); //convert JSON obj to string
+        this.loadNearByPost(); //call loading post function
     }
     onGeolocationFailure = () => {
         this.setState({
             loadingGeolocation: false,
             errorMessage: 'Failed to load geolocation',
         });
+    }
+
+    loadNearByPost() {
+
     }
 
     componentDidMount() { //call geolocation()
