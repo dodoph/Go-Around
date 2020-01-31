@@ -1,105 +1,108 @@
 import React from 'react';
-import { Tabs, Button } from 'antd';
+import { Tabs, Button, Spin } from 'antd';
 import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER } from '../constants';
-import '../styles/Home.css';
+import { Gallery } from './Gallery';
 
 const { TabPane } = Tabs;
 
 export class Home extends React.Component {
     state = {
-        loadingGeolocation: false,
-        loadingPosts: false, //state is reading post
-        errorMessage: null,
-        post:[], //store posts
+        isLoadingGeoLocation: false,
+        isLoadingPosts: false,
+        error: '',
+        posts: [],
     }
 
-    getGeolocation() {
-        this.setState({
-            loadingGeolocation: true,
-            errorMessage: null,
-        });
-        if ('geolocation' in navigator) {
+    componentDidMount() {
+        if ("geolocation" in navigator) {
+            this.setState({ isLoadingGeoLocation: true, error: '' });
             navigator.geolocation.getCurrentPosition(
-                this.onGeolocationSuccess,
-                this.onGeolocationFailure,
+                this.onSuccessLoadGeoLocation,
+                this.onFailedLoadGeoLocation,
                 GEOLOCATION_OPTIONS,
             );
         } else {
-            this.setState({
-                loadingGeolocation: false,
-                errorMessage: 'Your browser does not support geolocation.',
-            });
+            this.setState({ error: 'Geolocation is not supported.'});
         }
     }
-    //browser will call this lamuda function
-    onGeolocationSuccess = (position) => { //onGeolocationSuccess is variable which should bind this context-lamuda
-        this.setState({
-            loadingGeolocation: false,
-            errorMessage: null,
-        });
+
+    onSuccessLoadGeoLocation = (position) => {
         console.log(position);
-        const { latitude, longitude } = position.coords; //get position in object and map to coords
-        localStorage.setItem(POSITION_KEY, JSON.stringify({ latitude, longitude })); //convert JSON obj to string
-        this.loadNearByPost(); //call loading post function
-    }
-    onGeolocationFailure = () => {
-        this.setState({
-            loadingGeolocation: false,
-            errorMessage: 'Failed to load geolocation',
-        });
+        const { latitude, longitude } = position.coords;
+        localStorage.setItem(POSITION_KEY, JSON.stringify({ lat: latitude, lon: longitude }));
+        this.setState({ isLoadingGeoLocation: false, error: '' });
+        this.loadNearbyPosts();
     }
 
-    loadNearByPost() {
-        this.setState({
-            loadingPosts: true,
-            errorMessage: null,
-        });
-        const position = JSON.parse(localStorage.getItem(POSITION_KEY)); //convert string to JSON object
-        const range = 20000;
-        const token = localStorage.getItem(TOKEN_KEY); //get token from browser
+    onFailedLoadGeoLocation = () => {
+        this.setState({ isLoadingGeoLocation: false, error: 'Failed to load geo location.' });
+    }
 
-        fetch(`${API_ROOT}/search?lat=${position.latitude}&lon=${position.longitude}&range=${range}`, {
+    loadNearbyPosts = () => {
+        const { lat, lon } = JSON.parse(localStorage.getItem(POSITION_KEY));
+        const token = localStorage.getItem(TOKEN_KEY);
+        this.setState({ isLoadingPosts: true, error: '' });
+        fetch(`${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20000`, {
             method: 'GET',
             headers: {
-                Authorization: `${AUTH_HEADER} ${token}`,
-            },
-        }).then((response) => {
-            if (response.ok) {
-                return response.json();
+                Authorization: `${AUTH_HEADER} ${token}`
             }
-            throw new Error('Fail to load posts');
-        }).then((data) => {
-            console.log(data);
-            this.setState({
-                loadingPosts: false,
-                posts: data ? data : [],
-            })
-        }).catch((error) => {
-            this.setState({
-                loadingPosts: false,
-                errorMessage: error.message,
-            })
         })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to load post.');
+            })
+            .then((data) => {
+                console.log(data);
+                this.setState({ posts: data ? data : [], isLoadingPosts: false });
+            })
+            .catch((e) => {
+                console.error(e);
+                this.setState({ isLoadingPosts: false, error: e.message });
+            });
     }
 
-    componentDidMount() { //call geolocation()
-        this.getGeolocation();
+    renderImagePosts() {
+        const { error, isLoadingGeoLocation, isLoadingPosts, posts } = this.state;
+        if (error) {
+            return error;
+        } else if (isLoadingGeoLocation) {
+            return <Spin tip="Loading geo location..."/>;
+        } else if (isLoadingPosts) {
+            return <Spin tip="Loading posts..."/>
+        } else if (posts.length > 0) {
+            const images = posts.map((post) => {
+                return {
+                    user: post.user,
+                    src: post.url,
+                    thumbnail: post.url,
+                    caption: post.message,
+                    thumbnailWidth: 400,
+                    thumbnailHeight: 300,
+                };
+            });
+            return <Gallery images={images}/>
+        } else {
+            return 'No nearby posts';
+        }
     }
 
     render() {
-        const operations = <Button>Create New Post</Button>;
+        const operations = <Button type="primary">Create New Post</Button>;
         return (
             <Tabs tabBarExtraContent={operations} className="main-tabs">
                 <TabPane tab="Image Posts" key="1">
-                    content of tab 1
+                    {this.renderImagePosts()}
                 </TabPane>
-                <TabPane tab="Tab 2" key="2">
+                <TabPane tab="Video Posts" key="2">
                     Content of tab 2
                 </TabPane>
-                <TabPane tab="Tab 3" key="3">
+                <TabPane tab="Map" key="3">
                     Content of tab 3
                 </TabPane>
             </Tabs>
         );
     }
-};
+}
