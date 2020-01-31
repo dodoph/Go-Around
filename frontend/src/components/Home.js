@@ -25,13 +25,13 @@ export class Home extends React.Component {
             this.setState({ error: 'Geolocation is not supported.'});
         }
     }
-
+    ////browser will call this lamuda function
     onSuccessLoadGeoLocation = (position) => {
         console.log(position);
-        const { latitude, longitude } = position.coords;
-        localStorage.setItem(POSITION_KEY, JSON.stringify({ lat: latitude, lon: longitude }));
+        const { latitude, longitude } = position.coords; ////get position in object and map to coords
+        localStorage.setItem(POSITION_KEY, JSON.stringify({ lat: latitude, lon: longitude })); //convert JSON obj to string
         this.setState({ isLoadingGeoLocation: false, error: '' });
-        this.loadNearbyPosts();
+        this.loadNearbyPosts(); //call loading post function
     }
 
     onFailedLoadGeoLocation = () => {
@@ -39,8 +39,8 @@ export class Home extends React.Component {
     }
 
     loadNearbyPosts = () => {
-        const { lat, lon } = JSON.parse(localStorage.getItem(POSITION_KEY));
-        const token = localStorage.getItem(TOKEN_KEY);
+        const { lat, lon } = JSON.parse(localStorage.getItem(POSITION_KEY)); ////convert string to JSON object
+        const token = localStorage.getItem(TOKEN_KEY); //get token from browser
         this.setState({ isLoadingPosts: true, error: '' });
         fetch(`${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20000`, {
             method: 'GET',
@@ -72,8 +72,8 @@ export class Home extends React.Component {
             return <Spin tip="Loading geo location..."/>;
         } else if (isLoadingPosts) {
             return <Spin tip="Loading posts..."/>
-        } else if (posts.length > 0) {
-            const images = posts.map((post) => {
+        } else if (posts.length > 0) { //render post
+            const images = posts.map((post) => { //use map func to convert our post info to Gallery required type
                 return {
                     user: post.user,
                     src: post.url,
