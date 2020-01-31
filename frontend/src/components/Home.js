@@ -8,9 +8,9 @@ const { TabPane } = Tabs;
 export class Home extends React.Component {
     state = {
         isLoadingGeoLocation: false,
-        isLoadingPosts: false,
+        isLoadingPosts: false, //state is reading post
         error: '',
-        posts: [],
+        posts: [], //store posts
     }
 
     componentDidMount() {
