@@ -1,8 +1,7 @@
 import React from 'react';
 import { Tabs, Spin, Row, Col } from 'antd';
 import { CreatePostButton } from './CreatePostButton';
-import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER,POST_TYPE_IMAGE,
-    POST_TYPE_VIDEO, } from '../constants';
+import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER } from '../constants';
 import { Gallery } from './Gallery';
 
 const { TabPane } = Tabs;
