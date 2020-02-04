@@ -1,6 +1,8 @@
 import React from 'react';
-import { Tabs, Button, Spin } from 'antd';
-import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER } from '../constants';
+import { Tabs, Spin, Row, Col } from 'antd';
+import { CreatePostButton } from './CreatePostButton';
+import { GEOLOCATION_OPTIONS, POSITION_KEY, TOKEN_KEY, API_ROOT, AUTH_HEADER,POST_TYPE_IMAGE,
+    POST_TYPE_VIDEO, } from '../constants';
 import { Gallery } from './Gallery';
 
 const { TabPane } = Tabs;
@@ -39,9 +41,11 @@ export class Home extends React.Component {
     }
 
     loadNearbyPosts = () => {
+
+        this.setState({ isLoadingPosts: true, error: '' });
+
         const { lat, lon } = JSON.parse(localStorage.getItem(POSITION_KEY)); ////convert string to JSON object
         const token = localStorage.getItem(TOKEN_KEY); //get token from browser
-        this.setState({ isLoadingPosts: true, error: '' });
         fetch(`${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20000`, {
             method: 'GET',
             headers: {
@@ -67,7 +71,7 @@ export class Home extends React.Component {
     renderImagePosts() {
         const { error, isLoadingGeoLocation, isLoadingPosts, posts } = this.state;
         if (error) {
-            return error;
+            return <div>{error}</div>;
         } else if (isLoadingGeoLocation) {
             return <Spin tip="Loading geo location..."/>;
         } else if (isLoadingPosts) {
@@ -90,7 +94,7 @@ export class Home extends React.Component {
     }
 
     render() {
-        const operations = <Button type="primary">Create New Post</Button>;
+        const operations = <CreatePostButton onSuccess={this.loadNearbyPost} />;
         return (
             <Tabs tabBarExtraContent={operations} className="main-tabs">
                 <TabPane tab="Image Posts" key="1">
