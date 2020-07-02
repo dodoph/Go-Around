@@ -1,6 +1,7 @@
 # Go-Around
 
 [Project DEMO](https://recordit.co/5yJRqMo8pb)
+![](go-around.gif)
 
 ## Brief Summary
 
