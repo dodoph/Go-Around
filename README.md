@@ -23,6 +23,10 @@ This go-around project is a geo-index based social network application which pro
 
 ## Project Structure
 
+Frontend Ract components
+![](frontend-structure.png)
+
+Backend structure
 ![](structure.png)
 
 
