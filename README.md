@@ -2,8 +2,8 @@
 
 [Project DEMO](https://recordit.co/5yJRqMo8pb)
 
-![](go-around.gif)
-![](go-around2.gif)
+![](/pics/go-around.gif)
+![](/pics/go-around2.gif)
 
 ## Brief Summary
 
@@ -29,7 +29,7 @@ This go-around project is a geo-index based social network application which pro
 
 * Backend structure
 
-![](structure.png)
+![](/pics/structure.png)
 
 
 ## References
